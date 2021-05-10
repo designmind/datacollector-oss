@@ -73,6 +73,18 @@ public class KafkaSecurityUtil {
           configMap.put(KRB_SERVICE_NAME, securityConfig.kerberosServiceName);
         }
       }
+      
+      //SCRAM SASL 256
+      if (securityConfig.securityOption.equals(KafkaSecurityOptions.SASL_SSL_SCRAM_256)) {
+        configMap.put(ENABLED_PROTOCOLS, securityConfig.enabledProtocols);
+        configMap.put(SASL_MECHANISM, "SCRAM-SHA-256");
+      }
+
+      //SCRAM SASL 512
+      if (securityConfig.securityOption.equals(KafkaSecurityOptions.SASL_SSL_SCRAM_512)) {
+        configMap.put(ENABLED_PROTOCOLS, securityConfig.enabledProtocols);
+        configMap.put(SASL_MECHANISM, "SCRAM-SHA-512");
+      }
     }
   }
 
