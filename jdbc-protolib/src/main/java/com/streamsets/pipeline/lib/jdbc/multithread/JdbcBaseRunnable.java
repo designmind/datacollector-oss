@@ -302,7 +302,14 @@ public abstract class JdbcBaseRunnable implements Runnable, JdbcRunnable {
           );
 
           if (tableFinished.get()) {
-            TableFinishedEvent.createTableFinishedEvent(context, batchContext, tableRuntimeContext);
+            long expectedRecordCount = tableReadContext.getNumberOfRecords() + recordCount;
+            TableFinishedEvent.createTableFinishedEvent(context, batchContext, tableRuntimeContext, expectedRecordCount);
+            
+            LOG.info("---> QualifiedName : {} RecordCount : {} initialOffset {}", 
+              tableRuntimeContext.getQualifiedName(),
+              expectedRecordCount 
+              , tableRuntimeContext.getInitialStoredOffsets()
+            );
             eventCount++;
           }
           if (schemaFinished.get()) {

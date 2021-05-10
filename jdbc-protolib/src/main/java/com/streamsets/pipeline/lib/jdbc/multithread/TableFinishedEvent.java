@@ -42,19 +42,58 @@ public class TableFinishedEvent {
     )
     public static final String TABLE_FIELD = "table";
 
+    @EventFieldDef(
+        name = TableFinishedEvent.ROW_COUNT,
+        description = "Number of processed rows.",
+        optional = true
+    )
+    public static final String ROW_COUNT = "rowcount";
+
+    @EventFieldDef(
+        name = TableFinishedEvent.IS_ANY_OFFSETS_RECORDED,
+        description = "isAnyOffsetsRecorded.",
+        optional = true
+    )
+    public static final String IS_ANY_OFFSETS_RECORDED = "isanyoffsetsrecorded";
+
+    @EventFieldDef(
+        name = TableFinishedEvent.IS_USING_NONINCREMENTAL_LOAD,
+        description = "isUsingNonIncrementalLoad.",
+        optional = true
+    )
+    public static final String IS_USING_NONINCREMENTAL_LOAD = "isusingnonincrementalload";
+
+    @EventFieldDef(
+        name = TableFinishedEvent.INITIAL_OFFSETS,
+        description = "InitialStoredOffsets (empty after origin reset).",
+        optional = true
+    )
+    public static final String INITIAL_OFFSETS = "initialoffsets";
+        
     public static final EventCreator EVENT_CREATOR = new EventCreator.Builder(TABLE_FINISHED_TAG, VERSION)
         .withRequiredField(SCHEMA_FIELD)
         .withRequiredField(TABLE_FIELD)
+        .withOptionalField(ROW_COUNT)
+        .withOptionalField(IS_ANY_OFFSETS_RECORDED)
+        .withOptionalField(IS_USING_NONINCREMENTAL_LOAD)
+        .withOptionalField(INITIAL_OFFSETS)
         .build();
 
     public static void createTableFinishedEvent(
         PushSource.Context context,
         BatchContext batchContext,
-        TableRuntimeContext tableRuntimeContext
+        TableRuntimeContext tableRuntimeContext,
+        Long recordCount
     ) {
         EVENT_CREATOR.create(context, batchContext)
             .with(SCHEMA_FIELD,  tableRuntimeContext.getSourceTableContext().getSchema())
             .with(TABLE_FIELD, tableRuntimeContext.getSourceTableContext().getTableName())
+            .with(ROW_COUNT, recordCount)
+            .with(IS_ANY_OFFSETS_RECORDED, Boolean.toString(tableRuntimeContext.isAnyOffsetsRecorded()))
+            .with(IS_USING_NONINCREMENTAL_LOAD, Boolean.toString(tableRuntimeContext.isUsingNonIncrementalLoad()))
+            .with(INITIAL_OFFSETS, ((null == tableRuntimeContext.getInitialStoredOffsets() || 
+                tableRuntimeContext.getInitialStoredOffsets().isEmpty()) ? "" : 
+                    tableRuntimeContext.getInitialStoredOffsets().toString()))
             .createAndSend();
     }
 }
