@@ -62,6 +62,7 @@ public enum JdbcType {
       .put(Types.DECIMAL, DECIMAL)
       .put(Types.BINARY, BINARY)
       .put(Types.VARCHAR, VARCHAR)
+      .put(Types.NVARCHAR, VARCHAR)
       .build();
 
   JdbcTypeSupport support;
